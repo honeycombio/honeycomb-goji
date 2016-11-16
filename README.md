@@ -68,3 +68,16 @@ func hello(w http.ResponseWriter, r *http.Request) {
 		event.AddField("InsertTime_ms", time.Since(before).Seconds()*1000)
 }
 ```
+
+## Goji and the context package
+
+Goji's API was recently updated to use Go 1.7's standard library
+`context` package, which broke downstream unvendored packages like
+ours.
+
+`master` in goji-honey tracks Goji's `master`, and thus uses the new
+`context`-based API.
+
+Users of the old Goji API (found on Goji branch `net-context`) can
+find a goji-honey implementation on a branch of the same name:
+`net-context`.
