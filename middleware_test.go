@@ -16,8 +16,6 @@ import (
 	"goji.io"
 	"goji.io/pat"
 
-	"golang.org/x/net/context"
-
 	"github.com/honeycombio/goji-honey"
 	"github.com/honeycombio/libhoney-go"
 )
@@ -71,8 +69,8 @@ func (tr *testTransport) RoundTrip(r *http.Request) (*http.Response, error) {
 	return &http.Response{Body: ioutil.NopCloser(bytes.NewReader(nil))}, nil
 }
 
-func hello(ctx context.Context, w http.ResponseWriter, r *http.Request) {
-	name := pat.Param(ctx, "name")
+func hello(w http.ResponseWriter, r *http.Request) {
+	name := pat.Param(r, "name")
 	fmt.Fprintf(w, "Hello, %s!", name)
 }
 
@@ -88,13 +86,12 @@ func TestMiddleware(t *testing.T) {
 	})
 
 	mux := goji.NewMux()
-	mux.UseC(gojihoney.LogRequestToHoneycomb("gjv_"))
-	mux.HandleFuncC(pat.Get("/hello/:name"), hello)
+	mux.Use(gojihoney.LogRequestToHoneycomb("gjv_"))
+	mux.HandleFunc(pat.Get("/hello/:name"), hello)
 
 	r, _ := http.NewRequest("GET", "/hello/boris", nil)
 	w := httptest.NewRecorder()
-	ctx := context.TODO()
-	mux.ServeHTTPC(ctx, w, r)
+	mux.ServeHTTP(w, r)
 	libhoney.Close()
 	testEquals(t, tr.invoked, true)
 

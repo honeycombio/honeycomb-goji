@@ -25,22 +25,21 @@ import (
 
         "goji.io"
         "goji.io/pat"
-        "golang.org/x/net/context"
 		
 		"github.com/honeycombio/goji-honey"
 )
 
-func hello(ctx context.Context, w http.ResponseWriter, r *http.Request) {
-        name := pat.Param(ctx, "name")
+func hello(w http.ResponseWriter, r *http.Request) {
+        name := pat.Param(r, "name")
         fmt.Fprintf(w, "Hello, %s!", name)
 }
 
 func main() {
         mux := goji.NewMux()
 		
-		mux.UseC(gojihoney.LogRequestToHoneycomb("gjv_"))
+		mux.Use(gojihoney.LogRequestToHoneycomb("gjv_"))
 		
-        mux.HandleFuncC(pat.Get("/hello/:name"), hello)
+        mux.HandleFunc(pat.Get("/hello/:name"), hello)
 
         http.ListenAndServe("localhost:8000", mux)
 }
@@ -58,9 +57,9 @@ be extended by any inner handler during request handling, as in this
 possible change to `hello` above:
 
 ```go
-func hello(ctx context.Context, w http.ResponseWriter, r *http.Request) {
+func hello(w http.ResponseWriter, r *http.Request) {
         name := pat.Param(ctx, "name")
-		event := gojihoney.GetLibhoneyEvent(ctx)
+		event := gojihoney.GetLibhoneyEvent(r.Context())
 		
 		before := time.Now()
 

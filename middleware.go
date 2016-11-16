@@ -1,14 +1,13 @@
 package gojihoney
 
 import (
+	"context"
 	"net/http"
 	"time"
 
-	"goji.io"
 	"goji.io/middleware"
 	"goji.io/pat"
 	"goji.io/pattern"
-	"golang.org/x/net/context"
 
 	libhoney "github.com/honeycombio/libhoney-go"
 )
@@ -26,9 +25,10 @@ func GetLibhoneyEvent(ctx context.Context) *libhoney.Event {
 
 // Middleware: log http.Requests and response HTTP status/content-length/time
 // to Hound.
-func LogRequestToHoneycomb(varPrefix string) func(goji.Handler) goji.Handler {
-	return func(handler goji.Handler) goji.Handler {
-		return goji.HandlerFunc(func(ctx context.Context, w http.ResponseWriter, r *http.Request) {
+func LogRequestToHoneycomb(varPrefix string) func(http.Handler) http.Handler {
+	return func(handler http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			ctx := r.Context()
 			before := time.Now()
 
 			event := libhoney.NewEvent()
@@ -48,7 +48,7 @@ func LogRequestToHoneycomb(varPrefix string) func(goji.Handler) goji.Handler {
 			}
 
 			responseWriter := newResponseWriterProxy(w)
-			handler.ServeHTTPC(context.WithValue(ctx, libhoneyEventContextKey, event), responseWriter, r)
+			handler.ServeHTTP(responseWriter, r.WithContext(context.WithValue(ctx, libhoneyEventContextKey, event)))
 
 			event.AddField("ResponseHttpStatus", responseWriter.Status())
 			event.AddField("ResponseContentLength", responseWriter.Length())
