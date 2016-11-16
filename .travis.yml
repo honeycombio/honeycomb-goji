@@ -3,4 +3,4 @@ language: go
 dist: trusty
 
 go:
-        - 1.6
+        - 1.7.3
