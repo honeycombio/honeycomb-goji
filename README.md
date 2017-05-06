@@ -14,6 +14,8 @@ additions:
  - `ResponseContentLength` the amount of data written to the responseWriter
  - `ResponseTime_ms`       total response time in milliseconds, as measured in the middleware around inner handler.
 
+For more information about using Honeycomb, check out our [docs](https://honeycomb.io/docs) and our [Go SDK](https://honeycomb.io/docs/connect/go/).
+
 ## Example
 
 ```go
