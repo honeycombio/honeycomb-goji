@@ -1,4 +1,11 @@
 
+# Deprecated
+
+Please use the [Go Beeline](https://github.com/honeycombio/beeline-go) instead, which has an updated `goji` middleware.
+
+# Deprecated
+
+
 a goji middleware to log request data to http://honeycomb.io
 
 [![Build Status](https://travis-ci.org/honeycombio/goji-honey.svg?branch=master)](https://travis-ci.org/honeycombio/goji-honey)
